@@ -1,18 +1,20 @@
 # Claude DeepSeek
 
 <p align="center">
-  <strong>Run Claude Code with DeepSeek's Anthropic-compatible API on Linux boards.</strong>
+  <strong>Run Claude Code with DeepSeek's Anthropic-compatible API on Linux boards and Windows desktops.</strong>
 </p>
 
 <p align="center">
-  <a href="#quick-start"><img alt="Linux" src="https://img.shields.io/badge/Linux-supported-2ea44f?style=for-the-badge"></a>
+  <a href="#linux-quick-start"><img alt="Linux" src="https://img.shields.io/badge/Linux-supported-2ea44f?style=for-the-badge"></a>
+  <a href="#windows-quick-start"><img alt="Windows" src="https://img.shields.io/badge/Windows-supported-0078d4?style=for-the-badge&logo=windows&logoColor=white"></a>
   <a href="#requirements"><img alt="Node.js 18+" src="https://img.shields.io/badge/Node.js-18%2B-43853d?style=for-the-badge&logo=node.js&logoColor=white"></a>
   <a href="https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code"><img alt="DeepSeek" src="https://img.shields.io/badge/DeepSeek-Claude%20Code-0f172a?style=for-the-badge"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge"></a>
 </p>
 
 <p align="center">
-  <a href="#quick-start">Quick Start</a> |
+  <a href="#linux-quick-start">Linux</a> |
+  <a href="#windows-quick-start">Windows</a> |
   <a href="#what-it-installs">What It Installs</a> |
   <a href="#api-key-management">API Key Management</a> |
   <a href="#linux-board-notes">Linux Board Notes</a> |
@@ -21,8 +23,8 @@
 
 ---
 
-`claude-deepseek` is a small, board-friendly launcher that keeps the native
-`claude` command intact and adds a dedicated DeepSeek-backed command:
+`claude-deepseek` is a small launcher that keeps the native `claude` command
+intact and adds a dedicated DeepSeek-backed command:
 
 ```bash
 claude            # native Anthropic Claude Code
@@ -38,9 +40,9 @@ DeepSeek's strongest Claude Code model by default.
 
 ## Why
 
-Linux development boards often need a repeatable way to bootstrap Claude Code
-without hand-editing shell profiles on every device. This project packages the
-working pattern into installable commands:
+Linux development boards and Windows desktops often need a repeatable way to
+bootstrap Claude Code without hand-editing shell profiles on every device. This
+project packages the working pattern into installable commands:
 
 <table>
   <tr>
@@ -54,12 +56,12 @@ working pattern into installable commands:
     </td>
     <td width="33%">
       <h3>Board Ready</h3>
-      <p>Can install Node.js, Claude Code, and an optional HTTPS clock bootstrapper.</p>
+      <p>Can install Claude Code, add Windows shims, and provide an optional HTTPS clock bootstrapper for boards.</p>
     </td>
   </tr>
 </table>
 
-## Quick Start
+## Linux Quick Start
 
 Clone and install:
 
@@ -85,7 +87,7 @@ claude-deepseek
 The first run should open the normal Claude Code interface, but API requests go
 to DeepSeek's Anthropic-compatible endpoint.
 
-## One-Line Install
+## Linux One-Line Install
 
 For fresh boards:
 
@@ -108,6 +110,7 @@ chmod +x install.sh
 | Requirement | Notes |
 | --- | --- |
 | Linux | Debian, Ubuntu, Raspberry Pi OS, and most systemd-based board images are supported. |
+| Windows | Windows 10/11 with PowerShell 5.1+ or PowerShell 7+. |
 | CPU | `x86_64`, `aarch64/arm64`, and `armv7l` are supported for automatic Node.js installation. |
 | Node.js | Claude Code requires Node.js 18 or newer. The installer can bootstrap official Node.js 22 builds. |
 | npm | Used to install `@anthropic-ai/claude-code`. |
@@ -197,7 +200,58 @@ or:
 ANTHROPIC_AUTH_TOKEN='sk-...' claude-deepseek --print 'hello'
 ```
 
+## Windows Quick Start
+
+Install from PowerShell:
+
+```powershell
+git clone https://github.com/LiuAnclouds/claude-deepseek.git
+cd claude-deepseek
+.\install.ps1
+```
+
+If your PowerShell execution policy blocks local scripts, use:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+Configure your DeepSeek API key once:
+
+```powershell
+claude-deepseek-config
+```
+
+Start Claude Code through DeepSeek:
+
+```powershell
+claude-deepseek
+```
+
+The Windows installer adds `%LOCALAPPDATA%\claude-deepseek\bin` to the user
+PATH. Open a new terminal after installation if the command is not immediately
+available in the current session.
+
+Windows keeps the native `claude` command untouched. `claude-deepseek` is the
+DeepSeek-backed entry point.
+
+### Windows API Key Location
+
+The saved key lives at:
+
+```text
+%USERPROFILE%\.config\claude-deepseek\env
+```
+
+To remove it:
+
+```powershell
+claude-deepseek-config -Unset
+```
+
 ## Installation Options
+
+Linux:
 
 ```bash
 ./install.sh [options]
@@ -209,6 +263,19 @@ ANTHROPIC_AUTH_TOKEN='sk-...' claude-deepseek --print 'hello'
 | `--no-install-node` | Do not install Node.js automatically. |
 | `--skip-claude-code` | Only install the DeepSeek launcher/config commands. |
 | `--install-time-sync` | Install optional HTTPS Date-header clock bootstrap service. |
+
+Windows:
+
+```powershell
+.\install.ps1 [-ClaudeCodeVersion 2.1.153] [-SkipClaudeCode] [-NoPath]
+```
+
+| Parameter | Description |
+| --- | --- |
+| `-ClaudeCodeVersion` | Claude Code npm version to install. Default: `2.1.153`. |
+| `-InstallDir` | User install directory. Default: `%LOCALAPPDATA%\claude-deepseek`. |
+| `-SkipClaudeCode` | Only install the DeepSeek launcher/config commands. |
+| `-NoPath` | Do not modify the user PATH. |
 
 Environment variables:
 
@@ -269,6 +336,13 @@ git pull
 ./install.sh
 ```
 
+On Windows:
+
+```powershell
+git pull
+.\install.ps1
+```
+
 To change only the DeepSeek API key:
 
 ```bash
@@ -301,6 +375,13 @@ Claude Code itself is not removed by default. To remove it:
 npm uninstall -g @anthropic-ai/claude-code
 ```
 
+On Windows:
+
+```powershell
+.\uninstall.ps1
+.\uninstall.ps1 -PurgeConfig
+```
+
 ## Troubleshooting
 
 ### `No DeepSeek API key configured`
@@ -319,10 +400,17 @@ claude-deepseek
 
 ### `node: not found` or Node.js is too old
 
-Run:
+On Linux, run:
 
 ```bash
 ./install.sh --install-node
+```
+
+On Windows, install Node.js 22 LTS from [nodejs.org](https://nodejs.org), then
+rerun:
+
+```powershell
+.\install.ps1
 ```
 
 ### `CERT_NOT_YET_VALID`
@@ -348,6 +436,16 @@ claude-deepseek
 ```
 
 for DeepSeek.
+
+### Windows cannot find `claude-deepseek`
+
+Open a new PowerShell or Command Prompt after running `install.ps1`. If it still
+does not resolve, run:
+
+```powershell
+$env:Path += ";$env:LOCALAPPDATA\claude-deepseek\bin"
+claude-deepseek --version
+```
 
 ## References
 

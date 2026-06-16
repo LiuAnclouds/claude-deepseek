@@ -25,3 +25,23 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
           shellcheck install.sh uninstall.sh bin/claude-deepseek bin/claude-deepseek-config extras/https-time-sync
+
+  powershell:
+    name: PowerShell syntax
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse scripts
+        shell: pwsh
+        run: |
+          $scripts = @(
+            'install.ps1',
+            'uninstall.ps1',
+            'bin/windows/claude-deepseek.ps1',
+            'bin/windows/claude-deepseek-config.ps1'
+          )
+          foreach ($script in $scripts) {
+            [void][scriptblock]::Create((Get-Content $script -Raw))
+          }

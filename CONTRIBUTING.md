@@ -21,6 +21,7 @@ sh -n uninstall.sh
 sh -n bin/claude-deepseek
 sh -n bin/claude-deepseek-config
 sh -n extras/https-time-sync
+powershell -NoProfile -Command "Get-ChildItem *.ps1,bin/windows/*.ps1 | ForEach-Object { $null = [scriptblock]::Create((Get-Content $_ -Raw)) }"
 ```
 
 If `shellcheck` is available:
