@@ -232,6 +232,11 @@ The Windows installer adds `%LOCALAPPDATA%\claude-deepseek\bin` to the user
 PATH. Open a new terminal after installation if the command is not immediately
 available in the current session.
 
+Only `.cmd` shims are placed in the PATH directory. The PowerShell scripts live
+under `%LOCALAPPDATA%\claude-deepseek\libexec` and are launched with
+`-ExecutionPolicy Bypass`, so normal `claude-deepseek` usage is not blocked by a
+restricted PowerShell execution policy.
+
 Windows keeps the native `claude` command untouched. `claude-deepseek` is the
 DeepSeek-backed entry point.
 

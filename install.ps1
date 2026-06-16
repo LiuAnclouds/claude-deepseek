@@ -68,15 +68,17 @@ if (-not $SkipClaudeCode) {
 }
 
 $binDir = Join-Path $InstallDir 'bin'
+$libexecDir = Join-Path $InstallDir 'libexec'
 New-Item -ItemType Directory -Force -Path $binDir | Out-Null
+New-Item -ItemType Directory -Force -Path $libexecDir | Out-Null
 
 $sourceDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $windowsBin = Join-Path $sourceDir 'bin\windows'
 
-Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek.ps1') -Destination $binDir -Force
 Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek.cmd') -Destination $binDir -Force
-Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek-config.ps1') -Destination $binDir -Force
 Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek-config.cmd') -Destination $binDir -Force
+Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek.ps1') -Destination $libexecDir -Force
+Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek-config.ps1') -Destination $libexecDir -Force
 
 if (-not $NoPath) {
   Add-UserPath $binDir
