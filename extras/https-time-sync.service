@@ -1,0 +1,13 @@
+[Unit]
+Description=Set system clock from HTTPS Date header
+Wants=network-online.target
+After=network-online.target
+Before=ntp.service
+
+[Service]
+Type=oneshot
+ExecStart=@BIN_DIR@/https-time-sync
+TimeoutStartSec=180
+
+[Install]
+WantedBy=multi-user.target

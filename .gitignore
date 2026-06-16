@@ -1,0 +1,21 @@
+# Local secrets
+.env
+*.env
+*.key
+*.pem
+
+# Logs and temporary files
+*.log
+tmp/
+temp/
+.cache/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# npm scratch
+node_modules/
+npm-debug.log*

@@ -1,0 +1,27 @@
+name: Shell
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  syntax:
+    name: POSIX shell syntax
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: sh -n
+        run: |
+          sh -n install.sh
+          sh -n uninstall.sh
+          sh -n bin/claude-deepseek
+          sh -n bin/claude-deepseek-config
+          sh -n extras/https-time-sync
+
+      - name: shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          shellcheck install.sh uninstall.sh bin/claude-deepseek bin/claude-deepseek-config extras/https-time-sync

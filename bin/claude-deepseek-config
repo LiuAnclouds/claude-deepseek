@@ -1,0 +1,81 @@
+#!/usr/bin/env sh
+set -eu
+
+# Store, inspect, or remove the DeepSeek API key used by claude-deepseek.
+# The key is saved as raw text with mode 0600 so the launcher can read it
+# without using shell eval.
+
+CONFIG_DIR="${CLAUDE_DEEPSEEK_CONFIG_DIR:-$HOME/.config/claude-deepseek}"
+CONFIG_FILE="${CLAUDE_DEEPSEEK_CONFIG:-$CONFIG_DIR/env}"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  claude-deepseek-config          Save or replace the DeepSeek API key
+  claude-deepseek-config --show   Show whether a key is configured
+  claude-deepseek-config --path   Print the config file path
+  claude-deepseek-config --unset  Remove the saved key
+
+The key is never printed back to the terminal.
+EOF
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  --path)
+    printf '%s\n' "$CONFIG_FILE"
+    exit 0
+    ;;
+  --show)
+    if [ -s "$CONFIG_FILE" ]; then
+      perms=$(ls -l "$CONFIG_FILE" 2>/dev/null | awk '{print $1}')
+      echo "DeepSeek API key is configured at $CONFIG_FILE ($perms)"
+    else
+      echo "DeepSeek API key is not configured. Run: claude-deepseek-config"
+    fi
+    exit 0
+    ;;
+  --unset)
+    rm -f "$CONFIG_FILE"
+    echo "Removed $CONFIG_FILE"
+    exit 0
+    ;;
+  "")
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac
+
+if [ ! -t 0 ]; then
+  echo "This command must be run in an interactive terminal." >&2
+  exit 2
+fi
+
+printf 'DeepSeek API Key: ' >&2
+oldstty=$(stty -g)
+trap 'stty "$oldstty" >/dev/null 2>&1 || true' INT TERM EXIT
+stty -echo
+IFS= read -r key
+stty "$oldstty"
+trap - INT TERM EXIT
+printf '\n' >&2
+
+if [ -z "$key" ]; then
+  echo "API key is empty; nothing was changed." >&2
+  exit 1
+fi
+
+mkdir -p "$CONFIG_DIR"
+chmod 700 "$CONFIG_DIR"
+tmp="$CONFIG_FILE.tmp.$$"
+printf '%s\n' "$key" > "$tmp"
+chmod 600 "$tmp"
+mv "$tmp" "$CONFIG_FILE"
+
+echo "Saved DeepSeek API key to $CONFIG_FILE"
+echo "You can now run: claude-deepseek"

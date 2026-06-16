@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+set -eu
+
+# Small HTTPS Date-header clock bootstrapper for boards without working NTP.
+# It is intentionally conservative: only dates in a sane range are accepted.
+
+MIN_EPOCH=$(date -u -d '2024-01-01 00:00:00 UTC' +%s)
+MAX_EPOCH=$(date -u -d '2035-01-01 00:00:00 UTC' +%s)
+URLS="${HTTPS_TIME_SYNC_URLS:-https://registry.npmjs.org/ https://nodejs.org/dist/ https://www.google.com/generate_204}"
+ATTEMPTS="${HTTPS_TIME_SYNC_ATTEMPTS:-30}"
+
+attempt=1
+while [ "$attempt" -le "$ATTEMPTS" ]; do
+  for url in $URLS; do
+    header=$(curl -kfsSI --connect-timeout 8 --max-time 15 "$url" 2>/dev/null | awk -F': ' 'tolower($1)=="date" {print $2; exit}' | tr -d '\r' || true)
+    [ -n "$header" ] || continue
+
+    epoch=$(date -u -d "$header" +%s 2>/dev/null || true)
+    [ -n "$epoch" ] || continue
+
+    if [ "$epoch" -ge "$MIN_EPOCH" ] && [ "$epoch" -le "$MAX_EPOCH" ]; then
+      date -u -s "@$epoch"
+      hwclock -w >/dev/null 2>&1 || true
+      logger -t https-time-sync "set system clock from $url ($header)" >/dev/null 2>&1 || true
+      exit 0
+    fi
+  done
+
+  attempt=$((attempt + 1))
+  sleep 5
+done
+
+logger -t https-time-sync 'failed to set system clock from HTTPS Date header' >/dev/null 2>&1 || true
+exit 1
