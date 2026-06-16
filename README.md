@@ -208,10 +208,13 @@ Install from PowerShell:
 ```powershell
 git clone https://github.com/LiuAnclouds/claude-deepseek.git
 cd claude-deepseek
-.\install.ps1
+.\install.cmd
 ```
 
-If your PowerShell execution policy blocks local scripts, use:
+`install.cmd` launches the PowerShell installer with `-ExecutionPolicy Bypass`,
+so it works on machines where local `.ps1` scripts are restricted.
+
+PowerShell users can also call the installer directly:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\install.ps1
@@ -273,7 +276,7 @@ Linux:
 Windows:
 
 ```powershell
-.\install.ps1 [-ClaudeCodeVersion 2.1.153] [-SkipClaudeCode] [-NoPath]
+.\install.cmd [-ClaudeCodeVersion 2.1.153] [-SkipClaudeCode] [-NoPath]
 ```
 
 | Parameter | Description |
@@ -346,7 +349,7 @@ On Windows:
 
 ```powershell
 git pull
-.\install.ps1
+.\install.cmd
 ```
 
 To change only the DeepSeek API key:
@@ -384,8 +387,8 @@ npm uninstall -g @anthropic-ai/claude-code
 On Windows:
 
 ```powershell
-.\uninstall.ps1
-.\uninstall.ps1 -PurgeConfig
+.\uninstall.cmd
+.\uninstall.cmd -PurgeConfig
 ```
 
 ## Troubleshooting
@@ -416,7 +419,7 @@ On Windows, install Node.js 22 LTS from [nodejs.org](https://nodejs.org), then
 rerun:
 
 ```powershell
-.\install.ps1
+.\install.cmd
 ```
 
 ### `CERT_NOT_YET_VALID`
@@ -445,7 +448,7 @@ for DeepSeek.
 
 ### Windows cannot find `claude-deepseek`
 
-Open a new PowerShell or Command Prompt after running `install.ps1`. If it still
+Open a new PowerShell or Command Prompt after running `install.cmd`. If it still
 does not resolve, run:
 
 ```powershell

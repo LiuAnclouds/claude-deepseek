@@ -1,6 +1,8 @@
 *.sh text eol=lf
 *.ps1 text eol=crlf
 *.cmd text eol=crlf
+install.cmd text eol=crlf
+uninstall.cmd text eol=crlf
 bin/* text eol=lf
 bin/windows/* text eol=crlf
 extras/https-time-sync text eol=lf
