@@ -39,13 +39,13 @@ if (-not $env:ANTHROPIC_DEFAULT_OPUS_MODEL) {
   $env:ANTHROPIC_DEFAULT_OPUS_MODEL = 'deepseek-v4-pro[1m]'
 }
 if (-not $env:ANTHROPIC_DEFAULT_SONNET_MODEL) {
-  $env:ANTHROPIC_DEFAULT_SONNET_MODEL = 'deepseek-v4-pro[1m]'
+  $env:ANTHROPIC_DEFAULT_SONNET_MODEL = 'deepseek-v4-flash'
 }
 if (-not $env:ANTHROPIC_DEFAULT_HAIKU_MODEL) {
-  $env:ANTHROPIC_DEFAULT_HAIKU_MODEL = 'deepseek-v4-pro[1m]'
+  $env:ANTHROPIC_DEFAULT_HAIKU_MODEL = 'deepseek-v4-flash'
 }
 if (-not $env:CLAUDE_CODE_SUBAGENT_MODEL) {
-  $env:CLAUDE_CODE_SUBAGENT_MODEL = 'deepseek-v4-pro[1m]'
+  $env:CLAUDE_CODE_SUBAGENT_MODEL = 'deepseek-v4-flash'
 }
 if (-not $env:CLAUDE_CODE_EFFORT_LEVEL) {
   $env:CLAUDE_CODE_EFFORT_LEVEL = 'max'
