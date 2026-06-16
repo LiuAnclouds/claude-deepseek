@@ -65,7 +65,7 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 SOURCE_DIR="$SCRIPT_DIR"
 REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/LiuAnclouds/claude-deepseek/main}"
 TEMP_DIRS=""

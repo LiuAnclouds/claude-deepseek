@@ -31,8 +31,10 @@ case "${1:-}" in
     ;;
   --show)
     if [ -s "$CONFIG_FILE" ]; then
-      perms=$(ls -l "$CONFIG_FILE" 2>/dev/null | awk '{print $1}')
-      echo "DeepSeek API key is configured at $CONFIG_FILE ($perms)"
+      mode="readable"
+      [ -w "$CONFIG_FILE" ] && mode="$mode,writable"
+      [ -x "$CONFIG_FILE" ] && mode="$mode,executable"
+      echo "DeepSeek API key is configured at $CONFIG_FILE ($mode)"
     else
       echo "DeepSeek API key is not configured. Run: claude-deepseek-config"
     fi
