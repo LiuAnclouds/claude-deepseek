@@ -5,10 +5,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$ConfigFile = if ($env:CLAUDE_DEEPSEEK_CONFIG) {
-  $env:CLAUDE_DEEPSEEK_CONFIG
+$ConfigFile = if ($env:CLAUDE_HORIZON_CONFIG) {
+  $env:CLAUDE_HORIZON_CONFIG
 } else {
-  Join-Path $env:USERPROFILE '.config\claude-deepseek\env'
+  Join-Path $env:USERPROFILE '.config\claude-horizon\env'
 }
 
 if ($Path) {
@@ -18,9 +18,9 @@ if ($Path) {
 
 if ($Show) {
   if (Test-Path $ConfigFile) {
-    Write-Output "DeepSeek API key is configured at $ConfigFile"
+    Write-Output "Horizon API key is configured at $ConfigFile"
   } else {
-    Write-Output 'DeepSeek API key is not configured. Run claude-deepseek-config.'
+    Write-Output 'Horizon API key is not configured. Run claude-horizon-config.'
   }
   exit 0
 }
@@ -33,7 +33,7 @@ if ($Unset) {
   exit 0
 }
 
-$secure = Read-Host 'DeepSeek API Key' -AsSecureString
+$secure = Read-Host 'Horizon API Key' -AsSecureString
 $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure)
 try {
   $plain = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
@@ -48,9 +48,9 @@ if (-not $plain) {
 $dir = Split-Path -Parent $ConfigFile
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
 $content = @"
-# Claude DeepSeek API config
+# Claude Horizon API config
 ANTHROPIC_AUTH_TOKEN="$plain"
 "@
 Set-Content -LiteralPath $ConfigFile -Value $content -Encoding ASCII
-Write-Output "Saved DeepSeek API key to $ConfigFile"
-Write-Output 'You can now run claude-deepseek'
+Write-Output "Saved Horizon API key to $ConfigFile"
+Write-Output 'You can now run claude-horizon'

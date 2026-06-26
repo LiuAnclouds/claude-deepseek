@@ -12,7 +12,7 @@ Usage:
   ./uninstall.sh [options]
 
 Options:
-  --purge-config      Remove ~/.config/claude-deepseek
+  --purge-config      Remove ~/.config/claude-horizon
   --remove-time-sync  Disable and remove optional https-time-sync service
   -h, --help          Show this help
 EOF
@@ -49,8 +49,8 @@ as_root() {
   fi
 }
 
-as_root rm -f "$BIN_DIR/claude-deepseek" "$BIN_DIR/claude-deepseek-config"
-echo "Removed claude-deepseek commands from $BIN_DIR"
+as_root rm -f "$BIN_DIR/claude-horizon" "$BIN_DIR/claude-horizon-config" "$BIN_DIR/claude-horizon-models"
+echo "Removed claude-horizon commands from $BIN_DIR"
 
 if [ "$REMOVE_TIME_SYNC" = "1" ]; then
   if command -v systemctl >/dev/null 2>&1; then
@@ -63,8 +63,8 @@ if [ "$REMOVE_TIME_SYNC" = "1" ]; then
 fi
 
 if [ "$PURGE_CONFIG" = "1" ]; then
-  rm -rf "$HOME/.config/claude-deepseek"
-  echo "Removed $HOME/.config/claude-deepseek"
+  rm -rf "$HOME/.config/claude-horizon"
+  echo "Removed $HOME/.config/claude-horizon"
 fi
 
 echo "Native Claude Code was not removed. To remove it, run: npm uninstall -g @anthropic-ai/claude-code"

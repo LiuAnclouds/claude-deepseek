@@ -1,5 +1,5 @@
 param(
-  [string] $InstallDir = "$env:LOCALAPPDATA\claude-deepseek",
+  [string] $InstallDir = "$env:LOCALAPPDATA\claude-horizon",
   [switch] $PurgeConfig,
   [switch] $RemovePath
 )
@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Stop'
 
 function Write-Step {
   param([string] $Message)
-  Write-Host "[claude-deepseek] $Message"
+  Write-Host "[claude-horizon] $Message"
 }
 
 $binDir = Join-Path $InstallDir 'bin'
@@ -30,7 +30,7 @@ if ($RemovePath) {
 }
 
 if ($PurgeConfig) {
-  $configDir = Join-Path $env:USERPROFILE '.config\claude-deepseek'
+  $configDir = Join-Path $env:USERPROFILE '.config\claude-horizon'
   if (Test-Path $configDir) {
     Remove-Item -LiteralPath $configDir -Recurse -Force
     Write-Step "Removed $configDir"

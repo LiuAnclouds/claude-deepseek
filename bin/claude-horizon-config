@@ -1,20 +1,20 @@
 #!/usr/bin/env sh
 set -eu
 
-# Store, inspect, or remove the DeepSeek API key used by claude-deepseek.
+# Store, inspect, or remove the Horizon API key used by claude-horizon.
 # The key is saved as raw text with mode 0600 so the launcher can read it
 # without using shell eval.
 
-CONFIG_DIR="${CLAUDE_DEEPSEEK_CONFIG_DIR:-$HOME/.config/claude-deepseek}"
-CONFIG_FILE="${CLAUDE_DEEPSEEK_CONFIG:-$CONFIG_DIR/env}"
+CONFIG_DIR="${CLAUDE_HORIZON_CONFIG_DIR:-$HOME/.config/claude-horizon}"
+CONFIG_FILE="${CLAUDE_HORIZON_CONFIG:-$CONFIG_DIR/env}"
 
 usage() {
   cat <<'EOF'
 Usage:
-  claude-deepseek-config          Save or replace the DeepSeek API key
-  claude-deepseek-config --show   Show whether a key is configured
-  claude-deepseek-config --path   Print the config file path
-  claude-deepseek-config --unset  Remove the saved key
+  claude-horizon-config          Save or replace the Horizon API key
+  claude-horizon-config --show   Show whether a key is configured
+  claude-horizon-config --path   Print the config file path
+  claude-horizon-config --unset  Remove the saved key
 
 The key is never printed back to the terminal.
 EOF
@@ -34,9 +34,9 @@ case "${1:-}" in
       mode="readable"
       [ -w "$CONFIG_FILE" ] && mode="$mode,writable"
       [ -x "$CONFIG_FILE" ] && mode="$mode,executable"
-      echo "DeepSeek API key is configured at $CONFIG_FILE ($mode)"
+      echo "Horizon API key is configured at $CONFIG_FILE ($mode)"
     else
-      echo "DeepSeek API key is not configured. Run: claude-deepseek-config"
+      echo "Horizon API key is not configured. Run: claude-horizon-config"
     fi
     exit 0
     ;;
@@ -58,7 +58,7 @@ if [ ! -t 0 ]; then
   exit 2
 fi
 
-printf 'DeepSeek API Key: ' >&2
+printf 'Horizon API Key: ' >&2
 oldstty=$(stty -g)
 trap 'stty "$oldstty" >/dev/null 2>&1 || true' INT TERM EXIT
 stty -echo
@@ -79,5 +79,5 @@ printf '%s\n' "$key" > "$tmp"
 chmod 600 "$tmp"
 mv "$tmp" "$CONFIG_FILE"
 
-echo "Saved DeepSeek API key to $CONFIG_FILE"
-echo "You can now run: claude-deepseek"
+echo "Saved Horizon API key to $CONFIG_FILE"
+echo "You can now run: claude-horizon"

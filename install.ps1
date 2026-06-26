@@ -1,6 +1,6 @@
 param(
   [string] $ClaudeCodeVersion = $env:CLAUDE_CODE_VERSION,
-  [string] $InstallDir = "$env:LOCALAPPDATA\claude-deepseek",
+  [string] $InstallDir = "$env:LOCALAPPDATA\claude-horizon",
   [switch] $SkipClaudeCode,
   [switch] $NoPath
 )
@@ -13,7 +13,7 @@ if (-not $ClaudeCodeVersion) {
 
 function Write-Step {
   param([string] $Message)
-  Write-Host "[claude-deepseek] $Message"
+  Write-Host "[claude-horizon] $Message"
 }
 
 function Test-Node {
@@ -75,14 +75,16 @@ New-Item -ItemType Directory -Force -Path $libexecDir | Out-Null
 $sourceDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $windowsBin = Join-Path $sourceDir 'bin\windows'
 
-Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek.cmd') -Destination $binDir -Force
-Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek-config.cmd') -Destination $binDir -Force
-Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek.ps1') -Destination $libexecDir -Force
-Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-deepseek-config.ps1') -Destination $libexecDir -Force
+Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-horizon.cmd') -Destination $binDir -Force
+Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-horizon-config.cmd') -Destination $binDir -Force
+Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-horizon-models.cmd') -Destination $binDir -Force
+Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-horizon.ps1') -Destination $libexecDir -Force
+Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-horizon-config.ps1') -Destination $libexecDir -Force
+Copy-Item -LiteralPath (Join-Path $windowsBin 'claude-horizon-models.ps1') -Destination $libexecDir -Force
 
 if (-not $NoPath) {
   Add-UserPath $binDir
 }
 
 Write-Step "Installed Windows commands to $binDir"
-Write-Step 'Next: open a new terminal, run claude-deepseek-config, then claude-deepseek'
+Write-Step 'Next: open a new terminal, run claude-horizon-config, then claude-horizon'

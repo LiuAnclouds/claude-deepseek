@@ -16,15 +16,16 @@ jobs:
         run: |
           sh -n install.sh
           sh -n uninstall.sh
-          sh -n bin/claude-deepseek
-          sh -n bin/claude-deepseek-config
+          sh -n bin/claude-horizon
+          sh -n bin/claude-horizon-config
+          sh -n bin/claude-horizon-models
           sh -n extras/https-time-sync
 
       - name: shellcheck
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck
-          shellcheck install.sh uninstall.sh bin/claude-deepseek bin/claude-deepseek-config extras/https-time-sync
+          shellcheck install.sh uninstall.sh bin/claude-horizon bin/claude-horizon-config bin/claude-horizon-models extras/https-time-sync
 
   powershell:
     name: PowerShell syntax
@@ -39,8 +40,9 @@ jobs:
           $scripts = @(
             'install.ps1',
             'uninstall.ps1',
-            'bin/windows/claude-deepseek.ps1',
-            'bin/windows/claude-deepseek-config.ps1'
+            'bin/windows/claude-horizon.ps1',
+            'bin/windows/claude-horizon-config.ps1',
+            'bin/windows/claude-horizon-models.ps1'
           )
           foreach ($script in $scripts) {
             [void][scriptblock]::Create((Get-Content $script -Raw))

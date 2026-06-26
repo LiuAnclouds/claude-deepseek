@@ -1,14 +1,14 @@
-# Claude DeepSeek
+# Claude Horizon
 
 <p align="center">
-  <strong>Run Claude Code with DeepSeek's Anthropic-compatible API on Linux boards and Windows desktops.</strong>
+  <strong>Run Claude Code with Horizon's Anthropic-compatible API on Linux boards and Windows desktops.</strong>
 </p>
 
 <p align="center">
   <a href="#linux-quick-start"><img alt="Linux" src="https://img.shields.io/badge/Linux-supported-2ea44f?style=for-the-badge"></a>
   <a href="#windows-quick-start"><img alt="Windows" src="https://img.shields.io/badge/Windows-supported-0078d4?style=for-the-badge&logo=windows&logoColor=white"></a>
   <a href="#requirements"><img alt="Node.js 18+" src="https://img.shields.io/badge/Node.js-18%2B-43853d?style=for-the-badge&logo=node.js&logoColor=white"></a>
-  <a href="https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code"><img alt="DeepSeek" src="https://img.shields.io/badge/DeepSeek-Claude%20Code-0f172a?style=for-the-badge"></a>
+  <a href="https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code"><img alt="Horizon" src="https://img.shields.io/badge/Horizon-Claude%20Code-0f172a?style=for-the-badge"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge"></a>
 </p>
 
@@ -23,20 +23,19 @@
 
 ---
 
-`claude-deepseek` is a small launcher that keeps the native `claude` command
-intact and adds a dedicated DeepSeek-backed command:
+`claude-horizon` is a small launcher that keeps the native `claude` command
+intact and adds a dedicated Horizon-backed command:
 
 ```bash
 claude            # native Anthropic Claude Code
-claude-deepseek   # Claude Code routed to DeepSeek
+claude-horizon    # Claude Code routed to Horizon
 ```
 
-It follows DeepSeek's official Claude Code integration by setting
-`ANTHROPIC_BASE_URL` to DeepSeek's Anthropic-compatible endpoint and selecting
-DeepSeek's strongest Claude Code model by default.
+It follows the Anthropic-compatible API pattern by setting
+`ANTHROPIC_BASE_URL` to the API endpoint and using Horizon's model lineup.
 
-> Native Claude Code stays available as `claude`. DeepSeek-backed execution is
-> always explicit through `claude-deepseek`.
+> Native Claude Code stays available as `claude`. Horizon-backed execution is
+> always explicit through `claude-horizon`.
 
 ## Why
 
@@ -48,11 +47,11 @@ project packages the working pattern into installable commands:
   <tr>
     <td width="33%">
       <h3>Separate Command</h3>
-      <p>Leaves <code>claude</code> untouched and adds <code>claude-deepseek</code> for DeepSeek.</p>
+      <p>Leaves <code>claude</code> untouched and adds <code>claude-horizon</code> for Horizon.</p>
     </td>
     <td width="33%">
       <h3>One-Time Key Setup</h3>
-      <p>Stores the DeepSeek API key locally with user-only file permissions.</p>
+      <p>Stores the Horizon API key locally with user-only file permissions.</p>
     </td>
     <td width="33%">
       <h3>Board Ready</h3>
@@ -66,41 +65,41 @@ project packages the working pattern into installable commands:
 Clone and install:
 
 ```bash
-git clone https://github.com/LiuAnclouds/claude-deepseek.git
-cd claude-deepseek
+git clone https://github.com/LiuAnclouds/claude-horizon.git
+cd claude-horizon
 chmod +x install.sh
 ./install.sh
 ```
 
-Configure your DeepSeek API key once:
+Configure your Horizon API key once:
 
 ```bash
-claude-deepseek-config
+claude-horizon-config
 ```
 
-Start Claude Code through DeepSeek:
+Start Claude Code through Horizon:
 
 ```bash
-claude-deepseek
+claude-horizon
 ```
 
 The first run should open the normal Claude Code interface, but API requests go
-to DeepSeek's Anthropic-compatible endpoint.
+to Horizon's Anthropic-compatible endpoint.
 
 ## Linux One-Line Install
 
 For fresh boards:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/LiuAnclouds/claude-deepseek/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/LiuAnclouds/claude-horizon/main/install.sh | sh
 ```
 
 If the board has a bad system clock and TLS certificates fail, use the full
 clone flow and install the optional HTTPS time sync service:
 
 ```bash
-git clone https://github.com/LiuAnclouds/claude-deepseek.git
-cd claude-deepseek
+git clone https://github.com/LiuAnclouds/claude-horizon.git
+cd claude-horizon
 chmod +x install.sh
 ./install.sh --install-time-sync
 ```
@@ -114,7 +113,7 @@ chmod +x install.sh
 | CPU | `x86_64`, `aarch64/arm64`, and `armv7l` are supported for automatic Node.js installation. |
 | Node.js | Claude Code requires Node.js 18 or newer. The installer can bootstrap official Node.js 22 builds. |
 | npm | Used to install `@anthropic-ai/claude-code`. |
-| Network | The board must be able to reach `api.deepseek.com` over HTTPS. |
+| Network | The board must be able to reach `llmapi.horizon.auto` over HTTPS. |
 
 ## What It Installs
 
@@ -122,8 +121,8 @@ The installer adds two commands under `/usr/local/bin` by default:
 
 | Command | Purpose |
 | --- | --- |
-| `claude-deepseek` | Launch Claude Code with DeepSeek endpoint and model environment variables. |
-| `claude-deepseek-config` | Save, show, or remove the DeepSeek API key. |
+| `claude-horizon` | Launch Claude Code with Horizon endpoint and model environment variables. |
+| `claude-horizon-config` | Save, show, or remove the Horizon API key. |
 
 It also installs Claude Code when needed:
 
@@ -135,23 +134,30 @@ The native `claude` command is intentionally left alone.
 
 ## Default Model
 
-`claude-deepseek` uses DeepSeek Pro as the default model and keeps Flash
-available for lighter Claude Code roles:
+`claude-horizon` maps two models to Claude Code's role slots:
 
 ```bash
-ANTHROPIC_BASE_URL=https://api.deepseek.com/anthropic
-ANTHROPIC_MODEL=deepseek-v4-pro[1m]
-ANTHROPIC_DEFAULT_OPUS_MODEL=deepseek-v4-pro[1m]
-ANTHROPIC_DEFAULT_SONNET_MODEL=deepseek-v4-flash
-ANTHROPIC_DEFAULT_HAIKU_MODEL=deepseek-v4-flash
-CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-flash
+ANTHROPIC_BASE_URL=https://llmapi.horizon.auto
+ANTHROPIC_MODEL=HORIZON-DeepSeek-Pro
+ANTHROPIC_DEFAULT_OPUS_MODEL=HORIZON-DeepSeek-Pro
+ANTHROPIC_DEFAULT_SONNET_MODEL=HORIZON-GLM
+ANTHROPIC_DEFAULT_HAIKU_MODEL=HORIZON-DeepSeek-Pro
+CLAUDE_CODE_SUBAGENT_MODEL=HORIZON-GLM
 CLAUDE_CODE_EFFORT_LEVEL=max
 ```
 
-You can override any value for a single run:
+Use `claude-horizon-models` to reassign individual roles:
 
 ```bash
-ANTHROPIC_MODEL='deepseek-v4-flash' claude-deepseek
+claude-horizon-models --list                  # show current assignments
+claude-horizon-models --set sonnet HORIZON-DeepSeek-Pro
+claude-horizon-models --reset                 # back to defaults
+```
+
+You can also override any value for a single run:
+
+```bash
+ANTHROPIC_MODEL='HORIZON-GLM' claude-horizon
 ```
 
 ## API Key Management
@@ -159,31 +165,31 @@ ANTHROPIC_MODEL='deepseek-v4-flash' claude-deepseek
 Save or replace your key:
 
 ```bash
-claude-deepseek-config
+claude-horizon-config
 ```
 
 Check whether a key is configured:
 
 ```bash
-claude-deepseek-config --show
+claude-horizon-config --show
 ```
 
 Print the config path:
 
 ```bash
-claude-deepseek-config --path
+claude-horizon-config --path
 ```
 
 Remove the saved key:
 
 ```bash
-claude-deepseek-config --unset
+claude-horizon-config --unset
 ```
 
 The key is stored at:
 
 ```text
-~/.config/claude-deepseek/env
+~/.config/claude-horizon/env
 ```
 
 The directory is created with mode `700`, and the key file is written with mode
@@ -192,13 +198,13 @@ The directory is created with mode `700`, and the key file is written with mode
 For CI or temporary sessions, you can skip saved config:
 
 ```bash
-DEEPSEEK_API_KEY='sk-...' claude-deepseek --print 'hello'
+DEEPSEEK_API_KEY='sk-...' claude-horizon --print 'hello'
 ```
 
 or:
 
 ```bash
-ANTHROPIC_AUTH_TOKEN='sk-...' claude-deepseek --print 'hello'
+ANTHROPIC_AUTH_TOKEN='sk-...' claude-horizon --print 'hello'
 ```
 
 ## Windows Quick Start
@@ -206,8 +212,8 @@ ANTHROPIC_AUTH_TOKEN='sk-...' claude-deepseek --print 'hello'
 Install from PowerShell:
 
 ```powershell
-git clone https://github.com/LiuAnclouds/claude-deepseek.git
-cd claude-deepseek
+git clone https://github.com/LiuAnclouds/claude-horizon.git
+cd claude-horizon
 .\install.cmd
 ```
 
@@ -220,42 +226,42 @@ PowerShell users can also call the installer directly:
 powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
-Configure your DeepSeek API key once:
+Configure your Horizon API key once:
 
 ```powershell
-claude-deepseek-config
+claude-horizon-config
 ```
 
-Start Claude Code through DeepSeek:
+Start Claude Code through Horizon:
 
 ```powershell
-claude-deepseek
+claude-horizon
 ```
 
-The Windows installer adds `%LOCALAPPDATA%\claude-deepseek\bin` to the user
+The Windows installer adds `%LOCALAPPDATA%\claude-horizon\bin` to the user
 PATH. Open a new terminal after installation if the command is not immediately
 available in the current session.
 
 Only `.cmd` shims are placed in the PATH directory. The PowerShell scripts live
-under `%LOCALAPPDATA%\claude-deepseek\libexec` and are launched with
-`-ExecutionPolicy Bypass`, so normal `claude-deepseek` usage is not blocked by a
+under `%LOCALAPPDATA%\claude-horizon\libexec` and are launched with
+`-ExecutionPolicy Bypass`, so normal `claude-horizon` usage is not blocked by a
 restricted PowerShell execution policy.
 
-Windows keeps the native `claude` command untouched. `claude-deepseek` is the
-DeepSeek-backed entry point.
+Windows keeps the native `claude` command untouched. `claude-horizon` is the
+Horizon-backed entry point.
 
 ### Windows API Key Location
 
 The saved key lives at:
 
 ```text
-%USERPROFILE%\.config\claude-deepseek\env
+%USERPROFILE%\.config\claude-horizon\env
 ```
 
 To remove it:
 
 ```powershell
-claude-deepseek-config -Unset
+claude-horizon-config -Unset
 ```
 
 ## Installation Options
@@ -270,7 +276,7 @@ Linux:
 | --- | --- |
 | `--install-node` | Install official Node.js even when an existing Node.js is present. |
 | `--no-install-node` | Do not install Node.js automatically. |
-| `--skip-claude-code` | Only install the DeepSeek launcher/config commands. |
+| `--skip-claude-code` | Only install the Horizon launcher/config commands. |
 | `--install-time-sync` | Install optional HTTPS Date-header clock bootstrap service. |
 
 Windows:
@@ -282,8 +288,8 @@ Windows:
 | Parameter | Description |
 | --- | --- |
 | `-ClaudeCodeVersion` | Claude Code npm version to install. Default: `2.1.153`. |
-| `-InstallDir` | User install directory. Default: `%LOCALAPPDATA%\claude-deepseek`. |
-| `-SkipClaudeCode` | Only install the DeepSeek launcher/config commands. |
+| `-InstallDir` | User install directory. Default: `%LOCALAPPDATA%\claude-horizon`. |
+| `-SkipClaudeCode` | Only install the Horizon launcher/config commands. |
 | `-NoPath` | Do not modify the user PATH. |
 
 Environment variables:
@@ -333,7 +339,7 @@ variables before launching:
 ```bash
 export HTTPS_PROXY=http://proxy.example.com:8080
 export HTTP_PROXY=http://proxy.example.com:8080
-claude-deepseek
+claude-horizon
 ```
 
 ## Updating
@@ -352,10 +358,10 @@ git pull
 .\install.cmd
 ```
 
-To change only the DeepSeek API key:
+To change only the Horizon API key:
 
 ```bash
-claude-deepseek-config
+claude-horizon-config
 ```
 
 ## Uninstall
@@ -393,18 +399,18 @@ On Windows:
 
 ## Troubleshooting
 
-### `No DeepSeek API key configured`
+### `No Horizon API key configured`
 
 Run:
 
 ```bash
-claude-deepseek-config
+claude-horizon-config
 ```
 
 Then start again:
 
 ```bash
-claude-deepseek
+claude-horizon
 ```
 
 ### `node: not found` or Node.js is too old
@@ -441,19 +447,19 @@ claude
 as the native Claude Code command, and uses:
 
 ```bash
-claude-deepseek
+claude-horizon
 ```
 
-for DeepSeek.
+for Horizon.
 
-### Windows cannot find `claude-deepseek`
+### Windows cannot find `claude-horizon`
 
 Open a new PowerShell or Command Prompt after running `install.cmd`. If it still
 does not resolve, run:
 
 ```powershell
-$env:Path += ";$env:LOCALAPPDATA\claude-deepseek\bin"
-claude-deepseek --version
+$env:Path += ";$env:LOCALAPPDATA\claude-horizon\bin"
+claude-horizon --version
 ```
 
 ## References

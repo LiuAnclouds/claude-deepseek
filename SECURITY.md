@@ -8,10 +8,10 @@ credential handling bugs, or command injection concerns.
 
 ## Secret Handling
 
-`claude-deepseek-config` stores the DeepSeek API key at:
+`claude-horizon-config` stores the Horizon API key at:
 
 ```text
-~/.config/claude-deepseek/env
+~/.config/claude-horizon/env
 ```
 
 The file is written with mode `600`, and the key is never printed back to the

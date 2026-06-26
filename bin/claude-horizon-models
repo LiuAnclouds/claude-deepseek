@@ -1,0 +1,123 @@
+#!/usr/bin/env sh
+set -eu
+
+# Override individual model role assignments used by claude-horizon.
+# Each role maps to exactly one model.
+
+CONFIG_DIR="${CLAUDE_HORIZON_CONFIG_DIR:-$HOME/.config/claude-horizon}"
+MODELS_FILE="${CLAUDE_HORIZON_MODELS_FILE:-$CONFIG_DIR/models}"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  claude-horizon-models --list                  List current model assignments
+  claude-horizon-models --set ROLE MODEL        Set a role to a model
+  claude-horizon-models --reset                 Reset to defaults
+
+Roles:
+  main      ANTHROPIC_MODEL (default: HORIZON-DeepSeek-Pro)
+  opus      ANTHROPIC_DEFAULT_OPUS_MODEL
+  sonnet    ANTHROPIC_DEFAULT_SONNET_MODEL
+  haiku     ANTHROPIC_DEFAULT_HAIKU_MODEL
+  subagent  CLAUDE_CODE_SUBAGENT_MODEL
+
+Defaults:
+  main/opus/haiku: HORIZON-DeepSeek-Pro
+  sonnet/subagent: HORIZON-GLM
+
+Examples:
+  claude-horizon-models --set sonnet HORIZON-GLM
+  claude-horizon-models --set subagent HORIZON-DeepSeek
+EOF
+}
+
+role_to_env() {
+  case "$1" in
+    main)     printf '%s\n' 'ANTHROPIC_MODEL' ;;
+    opus)     printf '%s\n' 'ANTHROPIC_DEFAULT_OPUS_MODEL' ;;
+    sonnet)   printf '%s\n' 'ANTHROPIC_DEFAULT_SONNET_MODEL' ;;
+    haiku)    printf '%s\n' 'ANTHROPIC_DEFAULT_HAIKU_MODEL' ;;
+    subagent) printf '%s\n' 'CLAUDE_CODE_SUBAGENT_MODEL' ;;
+    *)
+      echo "error: unknown role '$1'. Valid roles: main, opus, sonnet, haiku, subagent" >&2
+      exit 2
+      ;;
+  esac
+}
+
+list_models() {
+  echo "Current model assignments:"
+  echo "  main/opus/haiku: HORIZON-DeepSeek-Pro"
+  echo "  sonnet/subagent: HORIZON-GLM"
+  if [ -r "$MODELS_FILE" ]; then
+    echo ""
+    echo "Overrides from $MODELS_FILE:"
+    while IFS= read -r line; do
+      case "$line" in
+        export\ *|*\=*) printf '  %s\n' "$line" ;;
+        ''|\#*) ;;
+        *) printf '  %s\n' "$line" ;;
+      esac
+    done < "$MODELS_FILE"
+  fi
+}
+
+set_model() {
+  role="$1"
+  model="$2"
+  if [ -z "$role" ] || [ -z "$model" ]; then
+    echo "Usage: claude-horizon-models --set <ROLE> <MODEL>" >&2
+    exit 2
+  fi
+
+  env_var=$(role_to_env "$role")
+
+  mkdir -p "$CONFIG_DIR"
+  chmod 700 "$CONFIG_DIR"
+
+  # Remove old entry for this env var, then append new one
+  if [ -r "$MODELS_FILE" ]; then
+    tmp=$(mktemp)
+    grep -v "^export ${env_var}=" "$MODELS_FILE" | grep -v "^${env_var}=" > "$tmp" 2>/dev/null || true
+    mv "$tmp" "$MODELS_FILE"
+  fi
+
+  echo "export ${env_var}='${model}'" >> "$MODELS_FILE"
+  chmod 600 "$MODELS_FILE"
+
+  echo "Set $role -> $model"
+  echo "Run claude-horizon to apply."
+}
+
+reset_models() {
+  rm -f "$MODELS_FILE"
+  echo "Reset to defaults (main/opus/haiku: HORIZON-DeepSeek-Pro, sonnet/subagent: HORIZON-GLM)."
+}
+
+case "${1:-}" in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+  --list)
+    list_models
+    exit 0
+    ;;
+  --set)
+    shift
+    set_model "${1:-}" "${2:-}"
+    exit 0
+    ;;
+  --reset)
+    reset_models
+    exit 0
+    ;;
+  "")
+    list_models
+    exit 0
+    ;;
+  *)
+    usage >&2
+    exit 2
+    ;;
+esac

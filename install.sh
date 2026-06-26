@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 set -eu
 
-PROJECT_NAME="claude-deepseek"
+PROJECT_NAME="claude-horizon"
 CLAUDE_CODE_VERSION="${CLAUDE_CODE_VERSION:-2.1.153}"
 NODE_MAJOR="${NODE_MAJOR:-22}"
 INSTALL_PREFIX="${INSTALL_PREFIX:-/usr/local}"
@@ -67,7 +67,7 @@ done
 
 SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 SOURCE_DIR="$SCRIPT_DIR"
-REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/LiuAnclouds/claude-deepseek/main}"
+REPO_RAW_BASE="${REPO_RAW_BASE:-https://raw.githubusercontent.com/LiuAnclouds/claude-horizon/main}"
 TEMP_DIRS=""
 
 cleanup() {
@@ -191,9 +191,10 @@ install_claude_code() {
 
 install_commands() {
   as_root mkdir -p "$BIN_DIR"
-  as_root install -m 0755 "$SOURCE_DIR/bin/claude-deepseek" "$BIN_DIR/claude-deepseek"
-  as_root install -m 0755 "$SOURCE_DIR/bin/claude-deepseek-config" "$BIN_DIR/claude-deepseek-config"
-  log "Installed claude-deepseek commands to $BIN_DIR"
+  as_root install -m 0755 "$SOURCE_DIR/bin/claude-horizon" "$BIN_DIR/claude-horizon"
+  as_root install -m 0755 "$SOURCE_DIR/bin/claude-horizon-config" "$BIN_DIR/claude-horizon-config"
+  as_root install -m 0755 "$SOURCE_DIR/bin/claude-horizon-models" "$BIN_DIR/claude-horizon-models"
+  log "Installed claude-horizon commands to $BIN_DIR"
 }
 
 install_time_sync() {
@@ -220,7 +221,7 @@ install_time_sync() {
 }
 
 prepare_source_files() {
-  if [ -f "$SOURCE_DIR/bin/claude-deepseek" ] && [ -f "$SOURCE_DIR/bin/claude-deepseek-config" ]; then
+  if [ -f "$SOURCE_DIR/bin/claude-horizon" ] && [ -f "$SOURCE_DIR/bin/claude-horizon-config" ] && [ -f "$SOURCE_DIR/bin/claude-horizon-models" ]; then
     return
   fi
 
@@ -230,8 +231,9 @@ prepare_source_files() {
 
   log "Source files not found next to install.sh; downloading from $REPO_RAW_BASE"
   for file in \
-    bin/claude-deepseek \
-    bin/claude-deepseek-config \
+    bin/claude-horizon \
+    bin/claude-horizon-config \
+    bin/claude-horizon-models \
     extras/https-time-sync \
     extras/https-time-sync.service
   do
@@ -253,7 +255,7 @@ main() {
   install_time_sync
 
   log "Done"
-  log "Next: run claude-deepseek-config, then claude-deepseek"
+  log "Next: run claude-horizon-config, then claude-horizon"
 }
 
 main "$@"
