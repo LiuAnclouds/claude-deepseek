@@ -73,17 +73,18 @@ set_model() {
   env_var=$(role_to_env "$role")
 
   mkdir -p "$CONFIG_DIR"
-  chmod 700 "$CONFIG_DIR"
+  chmod 700 "$CONFIG_DIR" 2>/dev/null || true
 
   # Remove old entry for this env var, then append new one
   if [ -r "$MODELS_FILE" ]; then
-    tmp=$(mktemp)
-    grep -v "^export ${env_var}=" "$MODELS_FILE" | grep -v "^${env_var}=" > "$tmp" 2>/dev/null || true
-    mv "$tmp" "$MODELS_FILE"
+    tmp="$MODELS_FILE.tmp.$$"
+    grep -v "^export ${env_var}=" "$MODELS_FILE" > "$tmp" 2>/dev/null || true
+    grep -v "^${env_var}=" "$tmp" > "$MODELS_FILE" 2>/dev/null || true
+    rm -f "$tmp"
   fi
 
   echo "export ${env_var}='${model}'" >> "$MODELS_FILE"
-  chmod 600 "$MODELS_FILE"
+  chmod 600 "$MODELS_FILE" 2>/dev/null || true
 
   echo "Set $role -> $model"
   echo "Run claude-horizon to apply."

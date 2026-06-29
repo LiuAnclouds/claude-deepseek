@@ -1,9 +1,6 @@
 param(
-  [switch] $List,
-  [string] $Set,
-  [string] $Role,
-  [switch] $Reset,
-  [switch] $Help
+  [Parameter(ValueFromRemainingArguments = $true)]
+  [string[]] $Args
 )
 
 $ErrorActionPreference = 'Stop'
@@ -23,9 +20,9 @@ $ModelsFile = if ($env:CLAUDE_HORIZON_MODELS_FILE) {
 function Write-Usage {
   Write-Output @'
 Usage:
-  claude-horizon-models -List                  List current model assignments
-  claude-horizon-models -Role ROLE -Set MODEL  Set a role to a model
-  claude-horizon-models -Reset                 Reset to defaults
+  claude-horizon-models --list                  List current model assignments
+  claude-horizon-models --set ROLE MODEL        Set a role to a model
+  claude-horizon-models --reset                 Reset to defaults
 
 Roles:
   main      ANTHROPIC_MODEL (default: HORIZON-DeepSeek-Pro)
@@ -39,8 +36,8 @@ Defaults:
   sonnet/subagent: HORIZON-GLM
 
 Examples:
-  claude-horizon-models -Role sonnet -Set HORIZON-GLM
-  claude-horizon-models -Role subagent -Set HORIZON-DeepSeek
+  claude-horizon-models --set sonnet HORIZON-GLM
+  claude-horizon-models --set subagent HORIZON-DeepSeek
 '@
 }
 
@@ -75,7 +72,7 @@ function Set-Model {
   param([string] $RoleName, [string] $ModelName)
 
   if (-not $RoleName -or -not $ModelName) {
-    throw 'Usage: claude-horizon-models -Role <ROLE> -Set <MODEL>'
+    throw 'Usage: claude-horizon-models --set <ROLE> <MODEL>'
   }
 
   $envVar = Get-RoleEnv -RoleName $RoleName
@@ -84,7 +81,7 @@ function Set-Model {
 
   # Remove old entry for this env var, then append new one
   if (Test-Path $ModelsFile) {
-    $lines = Get-Content -LiteralPath $ModelsFile | Where-Object { $_ -notmatch "^export\s+$envVar=" -and $_ -notmatch "^$envVar=" }
+    $lines = Get-Content -LiteralPath $ModelsFile | Where-Object { $_ -notmatch "^export\s+$([regex]::Escape($envVar))=" -and $_ -notmatch "^$([regex]::Escape($envVar))=" }
     $lines | Set-Content -LiteralPath $ModelsFile -Encoding ASCII
   }
 
@@ -101,24 +98,32 @@ function Reset-Models {
   Write-Output 'Reset to defaults (main/opus/haiku: HORIZON-DeepSeek-Pro, sonnet/subagent: HORIZON-GLM).'
 }
 
-if ($Help) {
-  Write-Usage
-  exit 0
-}
-
-if ($List) {
-  List-Models
-  exit 0
-}
-
-if ($Set -and $Role) {
-  Set-Model -RoleName $Role -ModelName $Set
-  exit 0
-}
-
-if ($Reset) {
-  Reset-Models
-  exit 0
+# Parse arguments manually (same syntax as Linux version)
+$i = 0
+while ($i -lt $Args.Count) {
+  switch ($Args[$i]) {
+    '--list' {
+      List-Models
+      exit 0
+    }
+    '--set' {
+      $role = if ($i + 1 -lt $Args.Count) { $Args[$i + 1] } else { '' }
+      $model = if ($i + 2 -lt $Args.Count) { $Args[$i + 2] } else { '' }
+      Set-Model -RoleName $role -ModelName $model
+      exit 0
+    }
+    '--reset' {
+      Reset-Models
+      exit 0
+    }
+    '-h' { Write-Usage; exit 0 }
+    '--help' { Write-Usage; exit 0 }
+    default {
+      Write-Usage
+      exit 2
+    }
+  }
+  $i++
 }
 
 # Default: show current assignments
