@@ -18,6 +18,12 @@ export ANTHROPIC_DEFAULT_HAIKU_MODEL="${ANTHROPIC_DEFAULT_HAIKU_MODEL:-deepseek-
 export CLAUDE_CODE_SUBAGENT_MODEL="${CLAUDE_CODE_SUBAGENT_MODEL:-deepseek-v4-flash}"
 export CLAUDE_CODE_EFFORT_LEVEL="${CLAUDE_CODE_EFFORT_LEVEL:-max}"
 
+# Pin Claude Code to the version installed by install.sh and disable the
+# built-in auto-updater. The user can opt back in by exporting
+# DISABLE_AUTOUPDATER=0 before invoking claude-deepseek.
+export DISABLE_AUTOUPDATER="${DISABLE_AUTOUPDATER:-1}"
+export CLAUDE_CODE_DISABLE_AUTOUPDATER="${CLAUDE_CODE_DISABLE_AUTOUPDATER:-1}"
+
 if [ -r "$CONFIG_FILE" ]; then
   first_line=$(sed -n '1p' "$CONFIG_FILE")
   case "$first_line" in
@@ -37,9 +43,22 @@ fi
 
 case " ${*:-} " in
   *" --version "*|*" -v "*|*" --help "*|*" -h "*)
+    if ! command -v "$REAL_CLAUDE" >/dev/null 2>&1; then
+      echo "Claude Code command not found: $REAL_CLAUDE" >&2
+      echo "Install it with: npm install -g @anthropic-ai/claude-code@2.1.153" >&2
+      echo "If it is already installed, add npm's global bin directory to PATH." >&2
+      exit 127
+    fi
     exec "$REAL_CLAUDE" "$@"
     ;;
 esac
+
+if ! command -v "$REAL_CLAUDE" >/dev/null 2>&1; then
+  echo "Claude Code command not found: $REAL_CLAUDE" >&2
+  echo "Install it with: npm install -g @anthropic-ai/claude-code@2.1.153" >&2
+  echo "If it is already installed, add npm's global bin directory to PATH." >&2
+  exit 127
+fi
 
 if [ -z "${ANTHROPIC_AUTH_TOKEN:-}" ] && [ -n "${DEEPSEEK_API_KEY:-}" ]; then
   ANTHROPIC_AUTH_TOKEN="$DEEPSEEK_API_KEY"

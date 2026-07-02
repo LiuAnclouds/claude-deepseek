@@ -180,13 +180,103 @@ ensure_node() {
 install_claude_code() {
   if [ "$SKIP_CLAUDE_CODE" = "1" ]; then
     log "Skipping Claude Code installation"
+    ensure_claude_on_path
     return
   fi
 
   need_cmd npm
   npm_bin=$(command -v npm)
-  log "Installing @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
+  log "Installing @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION} (pinned; auto-update disabled)"
   as_root "$npm_bin" install -g "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
+
+  ensure_claude_on_path
+  disable_claude_autoupdate
+}
+
+# Some npm setups install the `claude` shim into a prefix that is not on the
+# default PATH (e.g. ~/.npm-global/bin, /opt/node-*/bin). If `claude` is not
+# discoverable after the npm install, symlink it into $BIN_DIR so the
+# claude-deepseek launcher can always find it.
+ensure_claude_on_path() {
+  if command -v claude >/dev/null 2>&1; then
+    log "claude command available at: $(command -v claude)"
+    return
+  fi
+
+  candidate=""
+  if command -v npm >/dev/null 2>&1; then
+    npm_prefix=$(npm prefix -g 2>/dev/null || true)
+    if [ -n "$npm_prefix" ] && [ -x "$npm_prefix/bin/claude" ]; then
+      candidate="$npm_prefix/bin/claude"
+    fi
+  fi
+
+  if [ -z "$candidate" ]; then
+    for guess in \
+      "$INSTALL_PREFIX/bin/claude" \
+      "$HOME/.npm-global/bin/claude" \
+      "/usr/lib/node_modules/@anthropic-ai/claude-code/cli.js" \
+      "/usr/local/lib/node_modules/@anthropic-ai/claude-code/cli.js"
+    do
+      if [ -x "$guess" ]; then
+        candidate="$guess"
+        break
+      fi
+    done
+  fi
+
+  if [ -z "$candidate" ]; then
+    log "warning: could not locate the claude binary. Run 'npm root -g' and add its bin dir to PATH."
+    return
+  fi
+
+  as_root mkdir -p "$BIN_DIR"
+  as_root ln -sfn "$candidate" "$BIN_DIR/claude"
+  log "Linked claude -> $candidate at $BIN_DIR/claude"
+}
+
+# Disable the Claude Code built-in auto-updater so the pinned version stays
+# put. We touch both the installing user's config and root's (if we used sudo
+# during npm install) because Claude Code reads whichever HOME it runs under.
+disable_claude_autoupdate() {
+  set_autoupdate_false "$HOME/.claude.json" ""
+
+  if [ "$(id -u)" -ne 0 ] && command -v sudo >/dev/null 2>&1; then
+    root_home=$(getent passwd root 2>/dev/null | awk -F: '{print $6}')
+    [ -n "$root_home" ] || root_home="/root"
+    set_autoupdate_false "$root_home/.claude.json" "as_root"
+  fi
+}
+
+# Args: $1 = target path, $2 = "as_root" to run privileged
+set_autoupdate_false() {
+  target="$1"
+  privileged="${2:-}"
+
+  if [ -f "$target" ]; then
+    if command -v node >/dev/null 2>&1; then
+      if [ "$privileged" = "as_root" ]; then
+        as_root node -e 'const fs=require("fs"),p=process.argv[1];let d={};try{d=JSON.parse(fs.readFileSync(p,"utf8"))}catch(_){}d.autoUpdates=false;fs.writeFileSync(p,JSON.stringify(d,null,2)+"\n");' "$target"
+      else
+        node -e 'const fs=require("fs"),p=process.argv[1];let d={};try{d=JSON.parse(fs.readFileSync(p,"utf8"))}catch(_){}d.autoUpdates=false;fs.writeFileSync(p,JSON.stringify(d,null,2)+"\n");' "$target"
+      fi
+      log "Set autoUpdates=false in $target"
+    else
+      log "warning: node missing; cannot patch $target. Set \"autoUpdates\": false manually."
+    fi
+  else
+    dir=$(dirname "$target")
+    if [ "$privileged" = "as_root" ]; then
+      as_root mkdir -p "$dir"
+      printf '{\n  "autoUpdates": false\n}\n' | as_root tee "$target" >/dev/null
+      as_root chmod 600 "$target" >/dev/null 2>&1 || true
+    else
+      mkdir -p "$dir"
+      printf '{\n  "autoUpdates": false\n}\n' > "$target"
+      chmod 600 "$target" >/dev/null 2>&1 || true
+    fi
+    log "Wrote autoUpdates=false to new $target"
+  fi
 }
 
 install_commands() {

@@ -422,6 +422,34 @@ rerun:
 .\install.cmd
 ```
 
+### `exec: claude: not found`
+
+`claude-deepseek` delegates to the native Claude Code command named `claude`.
+Install Claude Code, then make sure npm's global binary directory is in `PATH`:
+
+```bash
+npm install -g @anthropic-ai/claude-code@2.1.153
+command -v claude
+claude-deepseek
+```
+
+If `npm` installed Claude Code but `command -v claude` prints nothing, add npm's
+global bin directory to your shell profile and reload it:
+
+```bash
+NPM_PREFIX="$(npm config get prefix)"
+echo 'export PATH="$(npm config get prefix)/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+command -v claude
+```
+
+On some boards, using the project installer is the easiest fix because it can
+install Node.js and Claude Code together:
+
+```bash
+./install.sh --install-node
+```
+
 ### `CERT_NOT_YET_VALID`
 
 Your system clock is wrong. Fix NTP, or install the optional clock bootstrapper:

@@ -60,11 +60,29 @@ if (-not $SkipClaudeCode) {
     throw 'npm was not found. Reinstall Node.js with npm enabled.'
   }
 
-  Write-Step "Installing @anthropic-ai/claude-code@$ClaudeCodeVersion"
+  Write-Step "Installing @anthropic-ai/claude-code@$ClaudeCodeVersion (pinned; auto-update disabled)"
   & $npm.Source install -g "@anthropic-ai/claude-code@$ClaudeCodeVersion"
   if ($LASTEXITCODE -ne 0) {
     throw 'npm failed to install Claude Code.'
   }
+
+  # Disable Claude Code's built-in auto-updater so the pinned version sticks.
+  $claudeJson = Join-Path $env:USERPROFILE '.claude.json'
+  $config = @{}
+  if (Test-Path -LiteralPath $claudeJson) {
+    try {
+      $raw = Get-Content -LiteralPath $claudeJson -Raw -ErrorAction Stop
+      if ($raw.Trim()) {
+        $config = $raw | ConvertFrom-Json -AsHashtable -ErrorAction Stop
+      }
+    } catch {
+      Write-Step "Existing $claudeJson could not be parsed; overwriting with autoUpdates=false"
+      $config = @{}
+    }
+  }
+  $config['autoUpdates'] = $false
+  ($config | ConvertTo-Json -Depth 20) | Set-Content -LiteralPath $claudeJson -Encoding UTF8
+  Write-Step "Set autoUpdates=false in $claudeJson"
 }
 
 $binDir = Join-Path $InstallDir 'bin'

@@ -50,6 +50,15 @@ if (-not $env:CLAUDE_CODE_SUBAGENT_MODEL) {
 if (-not $env:CLAUDE_CODE_EFFORT_LEVEL) {
   $env:CLAUDE_CODE_EFFORT_LEVEL = 'max'
 }
+# Pin Claude Code to the version installed by install.ps1 and disable the
+# built-in auto-updater. Set DISABLE_AUTOUPDATER=0 in your environment to
+# opt back in.
+if (-not $env:DISABLE_AUTOUPDATER) {
+  $env:DISABLE_AUTOUPDATER = '1'
+}
+if (-not $env:CLAUDE_CODE_DISABLE_AUTOUPDATER) {
+  $env:CLAUDE_CODE_DISABLE_AUTOUPDATER = '1'
+}
 
 $PassthroughWithoutAuth = $false
 foreach ($arg in $Args) {
